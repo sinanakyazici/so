@@ -1,0 +1,200 @@
+version: '3.4'
+
+networks:
+  backend:
+
+services:
+  apigateway:
+    container_name: so-apigateway
+    image: ${DOCKER_REGISTRY-}soapigateway
+    build:
+      context: .
+      dockerfile: src/ApiGateway/SO.ApiGateway/Dockerfile
+    networks:
+      - backend
+    depends_on:
+      - elasticsearch
+
+  orderservice:
+    container_name: so-orderservice
+    image: ${DOCKER_REGISTRY-}soorderservice
+    build:
+      context: .
+      dockerfile: src/OrderService/SO.OrderService/Dockerfile
+    networks:
+      - backend
+    depends_on:
+      - apigateway
+      - orderdatabase
+
+  customerservice:
+    container_name: so-customerservice
+    image: ${DOCKER_REGISTRY-}socustomerservice
+    build:
+      context: .
+      dockerfile: src/CustomerService/SO.CustomerService/Dockerfile
+    networks:
+      - backend
+    depends_on:
+      - apigateway
+      - customerdatabase
+
+  productservice:
+    container_name: so-productservice
+    image: ${DOCKER_REGISTRY-}soproductservice
+    build:
+      context: .
+      dockerfile: src/ProductService/SO.ProductService/Dockerfile
+    networks:
+      - backend
+    depends_on:
+      - apigateway
+      - productdatabase
+
+  elasticsearch:
+    container_name: so-elasticsearch
+    image: docker.elastic.co/elasticsearch/elasticsearch:7.16.1
+    environment:
+      - discovery.type=single-node
+      - xpack.monitoring.enabled=true
+      - xpack.watcher.enabled=false
+      - ES_JAVA_OPTS=-Xmx256m -Xms256m
+      - xpack.security.enabled=false
+    volumes:
+      - elasticsearch-data:/usr/share/elasticsearch/data
+    networks:
+      - backend
+
+  kibana:
+    container_name: so-kibana
+    image: docker.elastic.co/kibana/kibana:7.16.1
+    depends_on:
+      - elasticsearch
+    environment:
+      - ELASTICSEARCH_URL=http://localhost:9200
+    networks:
+      - backend
+
+  logstash:
+    image: docker.elastic.co/logstash/logstash:7.16.1
+    container_name: so-logstash
+    command: -f /etc/logstash/conf.d/
+    volumes:
+      - ./logstash.conf:/etc/logstash/conf.d/logstash.conf
+    environment:
+      LS_JAVA_OPTS: "-Xmx256m -Xms256m"
+    depends_on:
+      - elasticsearch
+    networks:
+      - backend
+
+  orderdatabase:
+    image: postgres:latest
+    container_name: so-orderdatabase
+    restart: always
+    environment:
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=postgres
+      #- POSTGRES_INITDB_ARGS=--lc-collate=Turkish_Turkey.1254
+    volumes: 
+      - orderdatabase-data:/var/lib/postgresql/data
+    networks:
+      - backend
+
+  customerdatabase:
+    image: postgres:latest
+    container_name: so-customerdatabase
+    restart: always
+    environment:
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=postgres
+    volumes: 
+      - customerdatabase-data:/var/lib/postgresql/data
+    networks:
+      - backend
+
+  productdatabase:
+    image: postgres:latest
+    container_name: so-productdatabase
+    restart: always
+    environment:
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=postgres
+    volumes: 
+      - productdatabase-data:/var/lib/postgresql/data
+    networks:
+      - backend
+
+  rabbitmq:
+    image: rabbitmq:3-management
+    container_name: so-rabbitmq
+    hostname: rabbitmq
+    restart: always
+    volumes:
+      - rabbitmq-data:/var/lib/rabbitmq/
+      - rabbitmq-log:/var/log/rabbitmq
+    networks:
+      - backend
+
+  mongodb:
+    image: mongo:latest
+    container_name: so-mongodb
+    environment:
+      - MONGO_INITDB_ROOT_USERNAME=admin
+      - MONGO_INITDB_ROOT_PASSWORD=admin
+    restart: always
+    volumes:
+      - mongodb-data:/data/db
+    networks:
+      - backend
+
+  redis:
+    image: redis:latest
+    container_name: so-redis
+    restart: always
+    networks:
+      - backend
+
+  sonarqube:
+    image: sonarqube:community
+    hostname: sonarqube
+    container_name: so-sonarqube
+    restart: always
+    environment:
+      SONAR_JDBC_URL: jdbc:postgresql://sonardatabase:5432/sonar
+      SONAR_JDBC_USERNAME: postgres
+      SONAR_JDBC_PASSWORD: postgres
+    volumes:
+      - sonarqube-data:/opt/sonarqube/data
+      - sonarqube-extensions:/opt/sonarqube/extensions
+      - sonarqube-logs:/opt/sonarqube/logs
+    networks:
+      - backend
+    depends_on:
+      - sonardatabase
+
+  sonardatabase:
+    image: postgres:latest
+    container_name: so-sonardatabase
+    restart: always
+    environment:
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=postgres
+      - POSTGRES_DB=sonar
+    volumes: 
+      - sonardatabase-data:/var/lib/postgresql/data
+    networks:
+      - backend
+
+volumes:
+  elasticsearch-data:
+  orderdatabase-data:
+  customerdatabase-data:
+  productdatabase-data:
+  rabbitmq-data:
+  rabbitmq-log:
+  mongodb-data:
+  sonarqube-data:
+  sonarqube-extensions:
+  sonarqube-logs:
+  sonardatabase-data:

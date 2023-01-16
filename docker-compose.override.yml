@@ -1,0 +1,74 @@
+version: '3.4'
+
+services:
+  apigateway:
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Development
+    ports:
+      - "61101:80"
+
+  orderservice:
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Development
+    ports:
+      - "61102:80"
+
+  customerservice:
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Development
+    ports:
+      - "61103:80"
+
+  productservice:
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Development
+    ports:
+      - "61104:80"
+
+  elasticsearch:
+    ports:
+      - "9200:9200"
+      - "9300:9300"
+
+  kibana:
+    ports:
+      - "5601:5601"
+
+  logstash:
+    ports:
+      - "5701:5701"
+  
+  orderdatabase:
+    ports:
+      - "5432:5432"
+
+  customerdatabase:
+    ports:
+      - "5433:5432"
+
+  productdatabase:
+    ports:
+      - "5434:5432"
+
+  rabbitmq:
+    ports:
+      # AMQP protocol port
+      - "5672:5672"
+      # HTTP management UI
+      - "15672:15672"
+
+  mongodb:
+    ports:
+      - "27017:27017"
+
+  redis:
+    ports:
+      - "6379:6379"
+
+  sonarqube:
+    ports:
+      - "9000:9000"
+
+  sonardatabase:
+    ports:
+      - "5435:5432"

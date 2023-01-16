@@ -1,0 +1,13 @@
+﻿{
+  "ReRouteIsCaseSensitive": false,
+  "DangerousAcceptAnyServerCertificateValidator": false,
+  "HttpHandlerOptions": {
+    "UseTracing": true
+  },
+  "RateLimitOptions": {
+    "DisableRateLimitHeaders": false,
+    "QuotaExceededMessage": "Customize Tips!",
+    "HttpStatusCode": 999,
+    "ClientIdHeader": "ClientId"
+  }
+}

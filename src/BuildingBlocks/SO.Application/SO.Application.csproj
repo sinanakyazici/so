@@ -1,0 +1,35 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net6.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+    <CodeAnalysisRuleSet>..\..\..\.sonarlint\socsharp.ruleset</CodeAnalysisRuleSet>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <AdditionalFiles Include="..\..\..\.sonarlint\so\CSharp\SonarLint.xml" Link="SonarLint.xml" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="AutoMapper" Version="12.0.0" />
+    <PackageReference Include="AutoMapper.Collection" Version="9.0.0" />
+    <PackageReference Include="AutoMapper.Extensions.Microsoft.DependencyInjection" Version="12.0.0" />
+    <PackageReference Include="EasyCaching.Core" Version="1.8.0" />
+    <PackageReference Include="EasyCaching.InMemory" Version="1.8.0" />
+    <PackageReference Include="EasyCaching.Redis" Version="1.8.0" />
+    <PackageReference Include="EasyCaching.Serialization.SystemTextJson" Version="1.8.0" />
+    <PackageReference Include="FluentValidation" Version="11.4.0" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\SO.Domain\SO.Domain.csproj" />
+    <ProjectReference Include="..\SO.Infrastructure.EventBus\SO.Infrastructure.EventBus.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Folder Include="Events\Bus\" />
+    <Folder Include="Mappers\" />
+  </ItemGroup>
+
+</Project>
